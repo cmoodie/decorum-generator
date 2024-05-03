@@ -1,6 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto
 from typing import List, Iterable
+import threading
 
 class Decorum:
     class Colour(Enum):
@@ -145,15 +146,15 @@ class Decorum:
         
         total = pow(5, 12) * pow(4, 4)
         
-        for arrangementNum in range(1, total + 1):
+        for arrangementNum in range(1, total):
             yield Decorum.Arrangement(objectColours, wallColours)
             
             goNextArrangementNum = False
-            currentModChecker = total
+            currentModChecker = 1
             
             for i in range(4):
-                currentModChecker /= 4
-                if arrangementNum % currentModChecker == 0:
+                currentModChecker *= 4
+                if arrangementNum % currentModChecker != 0:
                     wallColours[i] = getNextWallColour(wallColours[i])
                     goNextArrangementNum = True
                     break
@@ -162,10 +163,12 @@ class Decorum:
                 continue
             
             for i in range(12):
-                currentModChecker /= 5
+                currentModChecker *= 5
                 if arrangementNum % currentModChecker == 0:
                     objectColours[i] = getNextObjectColour(objectColours[i])
-                    break         
+                    break  
+                
+        yield Decorum.Arrangement(objectColours, wallColours)
 
     def calculateSSRF(isValid: callable = lambda x: True):
         total = pow(5, 12) * pow(4, 4)
